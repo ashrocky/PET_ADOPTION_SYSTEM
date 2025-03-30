@@ -1,1 +1,15 @@
+Flask
+Flask-CORS
+Flask-SQLAlchemy
+requests
+streamlit
+pandas
+numpy
+sqlite3  # Built-in for Python, but add if using manually
+SQLAlchemy
+Pillow  # Handles image uploads and processing
+email-validator  # Validates email fields in forms
+tensorflow
+torch
+scikit-learn
 
