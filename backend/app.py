@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify , send_from_directory
 from flask_cors import CORS
 import sqlite3
 import os
@@ -84,9 +84,15 @@ def add_pet():
         cursor.execute("""
             INSERT INTO pets (name, type, breed, age, gender, size, weight, color, vaccinated, personality, training, compatibility_pets, compatibility_kids, special_needs, status, image)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (data["name"], data["type"], data["breed"], data["age"], data["gender"], data["size"], data["weight"],
-              data["color"], data["vaccinated"], data["personality"], data["training"], data["compatibility_pets"],
-              data["compatibility_kids"], data["special_needs"], "Available", data["image"]))
+        """, (
+            data["name"], data["type"], data["breed"], data["age"], 
+            data["gender"], data["size"], data["weight"], data["color"], 
+            data["vaccinated"], data["personality"], 
+            data.get("training", ""),  # Add this line
+            data.get("compatibility_pets", ""), 
+            data.get("compatibility_kids", ""), 
+            data["special_needs"], "Available", data["image"]
+        ))
         conn.commit()
         return jsonify({"message": f"Pet {data['name']} added successfully!"}), 201
     except Exception as e:
@@ -94,6 +100,7 @@ def add_pet():
     finally:
         if conn:
             conn.close()
+
 
 # Adopt a pet (update status)
 @app.route("/adopt_pet/<int:pet_id>", methods=["PUT"])
@@ -116,6 +123,13 @@ def adopt_pet(pet_id):
     finally:
         if conn:
             conn.close()
+
+UPLOAD_FOLDER = os.path.join(os.getcwd(), "uploads")  # Change this if needed
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 if __name__ == "__main__":
     debug_mode = os.getenv("FLASK_DEBUG", "0") == "1"
